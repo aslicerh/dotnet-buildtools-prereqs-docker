@@ -1,17 +1,26 @@
-FROM mcr.microsoft.com/dotnet-buildtools/prereqs:centos-7-local
+#FROM mcr.microsoft.com/dotnet-buildtools/prereqs:centos-7-local
+FROM centos:7
 
 ENV RUBY_SCL="rh-ruby26"
 
+RUN yum install -y centos-release-scl-rh centos-release-scl
+
 # Install the rpm packaging toolchain required to build rpms
 RUN yum clean all \
-    && yum --enablerepo=centos-sclo-rh -y install ${RUBY_SCL} \
-    && yum --enablerepo=centos-sclo-rh -y install ${RUBY_SCL}-ruby-devel \
-    && yum --enablerepo=centos-sclo-rh -y install ${RUBY_SCL}-rubygems \
+    #&& yum --enablerepo=centos-sclo-rh -y install ${RUBY_SCL} \
+    #&& yum --enablerepo=centos-sclo-rh -y install ${RUBY_SCL}-ruby-devel \
+    #&& yum --enablerepo=centos-sclo-rh -y install ${RUBY_SCL}-rubygems \
     && yum install -y \
         gcc \
         rpm-build \
-    && scl enable ${RUBY_SCL} 'gem install --no-document fpm git:1.7.0 ffi:1.12.2' \
-    && yum clean all
+        make \
+        centos-release-scl \
+        ${RUBY_SCL} \
+        ${RUBY_SCL}-ruby-devel \
+        ${RUBY_SCL}-rubygems \
+        scl-utils \
+    && yum clean all \
+    && scl enable ${RUBY_SCL} 'gem install --no-document fpm git:1.7.0 ffi:1.12.2'
 
 ENV CONTAINER_SCRIPTS_PATH=/opt/app-root \
     ENABLED_COLLECTIONS="${RUBY_SCL}"
